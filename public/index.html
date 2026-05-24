@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      background-color: #050b14;
+      color: #e2e8f0;
+    }
+
+    /* Canvas 3D background */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      display: block;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      backdrop-filter: blur(2px);
+    }
+
+    /* glassmorphism effect for cards */
+    .glass {
+      background: rgba(15, 25, 45, 0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6, #1e3a8a);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 15px rgba(59,130,246,0.3);
+    }
+
+    .hero .tagline {
+      font-size: 1.4rem;
+      color: #93c5fd;
+      border-bottom: 2px solid #3b82f6;
+      display: inline-block;
+      padding-bottom: 0.25rem;
+    }
+
+    .hero p {
+      max-width: 700px;
+      margin: 1.2rem auto 0;
+      color: #cbd5e1;
+      font-size: 1.05rem;
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin: 3rem 0;
+    }
+
+    .feature-card {
+      background: rgba(15, 25, 45, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 1.8rem;
+      flex: 1;
+      min-width: 220px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 30px -12px rgba(59,130,246,0.3);
+      border-color: #3b82f6;
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #bfdbfe;
+    }
+
+    .feature-card p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+
+    .upload-section {
+      background: rgba(10, 20, 35, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 1px solid rgba(59,130,246,0.4);
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.3);
+    }
+
+    .upload-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: #bfdbfe;
+    }
+
+    .dropzone {
+      border: 2px dashed #3b82f6;
+      border-radius: 1.5rem;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 1rem;
+    }
+
+    .dropzone.drag-over {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #60a5fa;
+    }
+
+    .dropzone p {
+      margin: 0.5rem 0;
+      color: #cbd5e1;
+    }
+
+    .file-input-label {
+      background: #1e3a8a;
+      color: white;
+      padding: 0.6rem 1.5rem;
+      border-radius: 2rem;
+      display: inline-block;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .file-input-label:hover {
+      background: #2563eb;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    #file-info {
+      margin: 1rem 0;
+      text-align: center;
+      font-weight: 500;
+      color: #93c5fd;
+    }
+
+    button {
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 3rem;
+      cursor: pointer;
+      display: block;
+      width: fit-content;
+      margin: 1.5rem auto 0;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 0 10px rgba(59,130,246,0.5);
+    }
+
+    button:hover:not(:disabled) {
+      transform: scale(1.02);
+      box-shadow: 0 0 18px rgba(59,130,246,0.8);
+      background: linear-gradient(135deg, #2563eb, #60a5fa);
+    }
+
+    button:disabled {
+      background: #334155;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .loader {
+      display: none;
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #60a5fa;
+      font-weight: 500;
+    }
+
+    .loader.active {
+      display: block;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.85rem;
+      color: #7e8ba3;
+      border-top: 1px solid #1e293b;
+      padding-top: 2rem;
+    }
+
+    @media (max-width: 700px) {
+      .container { padding: 1rem; }
+      .hero h1 { font-size: 2.2rem; }
+      .upload-title { font-size: 1.4rem; }
+    }
+  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>.MDFIER – Any file to Markdown</title>
+  <style>
+    /* (same dark mode + glassmorphic styles as before, omitted for brevity) */
+    /* You can reuse your existing CSS – just ensure the fetch URL is correct */
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="container">
+    <div class="hero">
+      <h1>.MDFIER</h1>
+      <div class="tagline">Any file in, Markdown out.</div>
+      <p>Serverless – drag & drop any file, get clean Markdown.</p>
+    </div>
+
+    <div class="features">...</div>
+
+    <div class="upload-section">
+      <div class="upload-title"> Try it yourself</div>
+      <div class="dropzone" id="dropzone">
+        <p> Drop your file here</p>
+        <p>or</p>
+        <label class="file-input-label" for="file-input">Click to select</label>
+        <input type="file" id="file-input">
+      </div>
+      <div id="file-info"></div>
+      <button id="convert-btn" disabled>Convert to .MD</button>
+      <div class="loader" id="loader">⏳ Processing...</div>
+    </div>
+  </div>
+
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.128.0/build/three.module.js" } }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    // Setup scene, camera, renderer
+    const canvas = document.getElementById('bg-canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050b14);
+    scene.fog = new THREE.FogExp2(0x050b14, 0.003);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 2, 8);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0x111122);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0x3b82f6, 1);
+    directionalLight.position.set(2, 5, 3);
+    scene.add(directionalLight);
+    const backLight = new THREE.PointLight(0x1e3a8a, 0.5);
+    backLight.position.set(-2, 1, -4);
+    scene.add(backLight);
+
+    // Central glowing torus knot (futuristic)
+    const knotGeo = new THREE.TorusKnotGeometry(1.2, 0.3, 200, 32, 3, 4);
+    const knotMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, emissive: 0x1e3a8a, emissiveIntensity: 0.6, metalness: 0.8, roughness: 0.2 });
+    const knot = new THREE.Mesh(knotGeo, knotMat);
+    scene.add(knot);
+
+    // Floating particles (starfield)
+    const particleCount = 1500;
+    const particlesGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      positions[i*3] = (Math.random() - 0.5) * 200;
+      positions[i*3+1] = (Math.random() - 0.5) * 100;
+      positions[i*3+2] = (Math.random() - 0.5) * 80 - 40;
+    }
+    particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const particleMat = new THREE.PointsMaterial({ color: 0x60a5fa, size: 0.08, transparent: true, opacity: 0.6 });
+    const particles = new THREE.Points(particlesGeo, particleMat);
+    scene.add(particles);
+
+    // Additional floating glowing rings
+    const ringGeo = new THREE.TorusGeometry(1.6, 0.05, 64, 200);
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, emissive: 0x2563eb, emissiveIntensity: 0.4 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    scene.add(ring);
+
+    const ring2Geo = new THREE.TorusGeometry(2.0, 0.04, 64, 200);
+    const ring2Mat = new THREE.MeshStandardMaterial({ color: 0x60a5fa, emissive: 0x3b82f6, emissiveIntensity: 0.3 });
+    const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+    ring2.rotation.z = Math.PI / 3;
+    scene.add(ring2);
+
+    // Animation variables
+    let time = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      time += 0.008;
+
+      // Rotate central knot
+      knot.rotation.x = time * 0.5;
+      knot.rotation.y = time * 0.8;
+      
+      // Rotate rings
+      ring.rotation.z = time * 0.2;
+      ring2.rotation.x = time * 0.3;
+      ring2.rotation.y = time * 0.4;
+
+      // Particles slowly drift
+      particles.rotation.y = time * 0.05;
+      particles.rotation.x = time * 0.03;
+
+      // Slight camera movement for dynamism
+      camera.position.x = Math.sin(time * 0.2) * 0.3;
+      camera.position.y = 2 + Math.cos(time * 0.5) * 0.1;
+      camera.lookAt(0, 0.5, 0);
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+
+  <script>
+    // Pure JS for file handling
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const fileInfo = document.getElementById('file-info');
+    const convertBtn = document.getElementById('convert-btn');
+    const loader = document.getElementById('loader');
+    let selectedFile = null;
+
+    function updateUI() {
+      if (selectedFile) {
+        fileInfo.innerHTML = `✅ <strong>${selectedFile.name}</strong> (${(selectedFile.size / 1024).toFixed(1)} KB) ready.`;
+        convertBtn.disabled = false;
+      } else {
+        fileInfo.innerHTML = '';
+        convertBtn.disabled = true;
+      }
+    }
+
+    function handleFile(file) {
+      if (!file) return;
+      selectedFile = file;
+      updateUI();
+    }
+
+    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+    // Drag & drop
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('drag-over');
+    });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      handleFile(file);
+      fileInput.files = e.dataTransfer.files;
+    });
+
+    // Prevent double dialog: label click should not bubble to dropzone
+    const label = document.querySelector('.file-input-label');
+    label.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+    // Dropzone click: only if target is not the label
+    dropzone.addEventListener('click', (e) => {
+      if (e.target.closest('.file-input-label')) return;
+      fileInput.click();
+    });
+
+    convertBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      convertBtn.disabled = true;
+      loader.classList.add('active');
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        // ✅ FIXED: use /api/convert for serverless function
+        const response = await fetch('/api/convert', {
+          method: 'POST',
+          body: formData
+        });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server error (${response.status}): ${errorText.substring(0, 100)}`);
+        }
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const baseName = selectedFile.name.replace(/\.[^.]*$/, '');
+        a.download = `${baseName}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('Conversion failed: ' + err.message);
+      } finally {
+        loader.classList.remove('active');
+        convertBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
