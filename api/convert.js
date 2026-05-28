@@ -55,3 +55,8 @@ async function convertToMarkdown(filePath, originalName, mimeType) {
   // Make sure to use fs.readFileSync and the libraries correctly.
   // Reuse the exact code from my earlier serverless answer.
 }
+
+const rawName = originalName.replace(/\.[^.]*$/, '') + '.md';
+// Encode UTF-8 as per RFC 5987
+const encodedName = encodeURIComponent(rawName).replace(/['()]/g, escape).replace(/\*/g, '%2A');
+res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedName}`);
